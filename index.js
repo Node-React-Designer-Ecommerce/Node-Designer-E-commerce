@@ -4,7 +4,6 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 const cors = require("cors");
 require("express-async-errors");
-const path = require("path");
 
 // Custom Error Class
 const AppError = require("./utils/AppError");
@@ -23,6 +22,7 @@ app.use(express.json());
 app.use(express.static("./public"));
 
 // Use Routes
+
 // ---------------------
 app.use("/", (req, res) => {
   res.send({ message: "Welcome To the Server" });
@@ -38,7 +38,7 @@ app.all("/*", (req, res, next) => {
 
 // Global Error Middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  logger.error(err.stack);
   res.status(err.statusCode || 500).json({
     message: err.message || "Internal Server Error",
   });
@@ -47,7 +47,7 @@ app.use((err, req, res, next) => {
 // Connect to MongoDB
 
 mongoose
-  .connect(process.env.DATABASE_URL)
+  .connect(process.env.DATABASE_URI)
   .then(() => {
     logger.info("Connected to MongoDB Server");
     app.listen(process.env.PORT, () => {
