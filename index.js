@@ -7,6 +7,7 @@ require("express-async-errors");
 
 // Routers Imports
 const userRouter = require("./Routes/userRouter");
+const designRouter = require("./Routes/designRouter");
 // Custom Error Class
 const AppError = require("./Utils/AppError");
 // Logger
@@ -29,7 +30,8 @@ app.use(express.json());
 
 // Use Routes
 // ---------------------
-app.use("/users", userRouter);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/designs", designRouter);
 
 // Not Found Routes
 app.all("/*", (req, res, next) => {

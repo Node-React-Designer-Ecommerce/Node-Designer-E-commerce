@@ -12,7 +12,7 @@ const { restrictTo, auth } = require("../Middlewares/authMiddleware");
 
 const router = Router();
 
-router.get("/", auth, restrictTo("user"), getUsers);
+router.get("/", auth, restrictTo("admin"), getUsers);
 router.get("/me", auth, restrictTo("user"), getLoggedInUser);
 router.post("/signup", signup);
 router.post("/login", login);
