@@ -5,9 +5,15 @@ const morgan = require("morgan");
 const cors = require("cors");
 require("express-async-errors");
 
+// Routers Imports
+const userRouter = require("./Routes/userRouter");
 // Custom Error Class
-const AppError = require("./utils/AppError");
+const AppError = require("./Utils/AppError");
+// Logger
 const logger = require("./utils/logger");
+
+// Global Error Middleware import
+const globalErrorMiddleware = require("./Middlewares/globalErrorMiddleware");
 
 // Define Express app
 const app = express();
@@ -19,14 +25,11 @@ dotenv.config();
 app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
-app.use(express.static("./public"));
+// app.use(express.static("./public"));
 
 // Use Routes
-
 // ---------------------
-app.use("/", (req, res) => {
-  res.send({ message: "Welcome To the Server" });
-});
+app.use("/users", userRouter);
 
 // Not Found Routes
 app.all("/*", (req, res, next) => {
@@ -37,15 +40,9 @@ app.all("/*", (req, res, next) => {
 });
 
 // Global Error Middleware
-app.use((err, req, res, next) => {
-  logger.error(err.stack);
-  res.status(err.statusCode || 500).json({
-    message: err.message || "Internal Server Error",
-  });
-});
+app.use(globalErrorMiddleware);
 
 // Connect to MongoDB
-
 mongoose
   .connect(process.env.DATABASE_URI)
   .then(() => {
