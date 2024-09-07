@@ -53,7 +53,7 @@ exports.updateDesign = async (req, res, next) => {
     { ...req.body },
     { new: true, runValidators: true }
   );
-  res.send({
+  res.status(200).send({
     status: "success",
     message: "design updated successfully",
     data: { design },
@@ -66,5 +66,5 @@ exports.deleteDesign = async (req, res, next) => {
   await Design.deleteOne({ _id: req.params.id });
   res
     .status(204)
-    .send({ status: "success", message: "game deleted successfully" });
+    .send({ status: "success", message: "design deleted successfully" });
 };
