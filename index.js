@@ -1,8 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
 const morgan = require("morgan");
 const cors = require("cors");
+require("dotenv").config();
 require("express-async-errors");
 
 // Routers Imports
@@ -12,7 +12,7 @@ const productRouter = require("./Routes/productRouter");
 // Custom Error Class
 const AppError = require("./Utils/AppError");
 // Logger
-const logger = require("./utils/logger");
+const logger = require("./Utils/logger");
 
 // Global Error Middleware import
 const globalErrorMiddleware = require("./Middlewares/globalErrorMiddleware");
@@ -20,20 +20,21 @@ const globalErrorMiddleware = require("./Middlewares/globalErrorMiddleware");
 // Define Express app
 const app = express();
 
-// Load environment variables
-dotenv.config();
-
 // Use middlewares
 app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
-// app.use(express.static("./public"));
 
 // Use Routes
 // ---------------------
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/designs", designRouter);
 app.use("/api/v1/products", productRouter);
+
+// Welcome Route
+app.get("/", (req, res) => {
+  res.send({ message: "Welcome to the Express app!" });
+});
 
 // Not Found Routes
 app.all("/*", (req, res, next) => {

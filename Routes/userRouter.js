@@ -16,8 +16,8 @@ router.get("/", auth, restrictTo("admin"), getUsers);
 router.get("/me", auth, restrictTo("user"), getLoggedInUser);
 router.post("/signup", signup);
 router.post("/login", login);
-router.get("/:id", getUserById);
-router.delete("/:id", deleteUser);
-router.patch("/:id", updateUser);
+router.get("/:id", auth, getUserById);
+router.delete("/:id", auth, restrictTo("admin"), deleteUser);
+router.patch("/:id", auth, restrictTo("user"), updateUser);
 
 module.exports = router;

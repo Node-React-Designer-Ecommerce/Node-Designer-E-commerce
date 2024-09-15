@@ -1,4 +1,4 @@
-const logger = require("../utils/logger");
+const logger = require("../Utils/logger");
 
 // Middleware for handling errors globally
 module.exports = (err, req, res, next) => {
@@ -29,7 +29,7 @@ module.exports = (err, req, res, next) => {
     err.statusCode = 401;
   }
   logger.error(err.stack);
-  res.status(err.statusCode).json({
+  res.status(err.statusCode).send({
     status: err.status,
     error: {
       name: err.name,
