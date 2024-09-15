@@ -2,6 +2,44 @@ const AppError = require("../Utils/AppError");
 const User = require("./../Models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const Joi = require("joi");
+
+// Joi schema for user signup
+const signupSchema = Joi.object({
+  name: Joi.string().min(3).max(50).required(),
+  email: Joi.string().email().required(),
+  address: Joi.string().min(3).max(100).required(),
+  password: Joi.string()
+    .min(8)
+    .max(30)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,20}$/)
+
+    .required()
+    .messages({
+      "string.pattern.base":
+        "Password must contain at least one uppercase letter, one lowercase letter, one number.",
+    }),
+  passwordConfirm: Joi.string().valid(Joi.ref("password")).required().messages({
+    "any.only": "Passwords do not match",
+  }),
+});
+
+// Joi schema for login validation
+const loginSchema = Joi.object({
+  email: Joi.string().email().required().messages({
+    "string.email": "Invalid email format",
+    "string.empty": "Email is required",
+  }),
+  password: Joi.string()
+    .min(8)
+    .max(30)
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,20}$/)
+    .required()
+    .messages({
+      "string.min": "Password must be at least 8 characters long",
+      "string.empty": "Password is required",
+    }),
+});
 
 exports.getUsers = async (req, res, next) => {
   const users = await User.find();
@@ -29,7 +67,14 @@ exports.getUserById = async (req, res, next) => {
 };
 
 exports.signup = async (req, res, next) => {
-  //lesa fe validation
+  // Validate request body with Joi
+  const { error } = signupSchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    const errorMessages = error.details
+      .map((detail) => detail.message)
+      .join(", ");
+    return next(new AppError(errorMessages, 400));
+  }
   const { name, email, address, password, passwordConfirm } = req.body;
   //check if password matches passwordConfirm
   if (passwordConfirm !== password) {
@@ -37,6 +82,14 @@ exports.signup = async (req, res, next) => {
   }
   //hash the password
   const hashedPassword = await bcrypt.hash(password, 8);
+
+  //see if the user exists or not
+  const existEmail = await User.findOne({ email });
+  if (existEmail)
+    return res
+      .status(409)
+      .send({ status: "fail", message: "email is already used" });
+
   //create new user
   const newUser = await User.create({
     name,
