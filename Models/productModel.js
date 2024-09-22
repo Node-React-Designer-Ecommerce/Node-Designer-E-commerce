@@ -11,16 +11,20 @@ const productSchema = new mongoose.Schema(
     price: {
       type: Number,
     },
-    size: {
-      type: String,
-      enum: ["3XL", "2XL", "XL", "L", "M"],
-    },
-    quantity: {
-      type: Number,
-    },
+    stock: [
+      {
+        quantity: Number,
+        size: String,
+      },
+    ],
     image: {
       type: String,
     },
+    isDesignable: {
+      type: Boolean,
+    },
+    canvasWidth: Number,
+    canvasHeight: Number,
   },
   {
     timestamps: true,
