@@ -70,3 +70,15 @@ exports.deleteProduct = async (req, res, next) => {
     message: "product deleted successfully",
   });
 };
+
+// 6- designable product
+
+exports.getDesignableProducts = async (req, res, next) => {
+  const products = await Product.find({ isDesignable: true });
+  if (!products) throw new AppError("No designable products found", 404);
+  res.status(200).send({
+    status: "success",
+    message: "Designable products retrieved successfully",
+    data: { products },
+  });
+};

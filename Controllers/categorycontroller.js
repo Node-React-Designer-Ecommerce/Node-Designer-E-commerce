@@ -63,7 +63,7 @@ exports.updateCategroy = async (req, res, next) => {
   const categoryId = req.params.id;
   const category = await Category.findByIdAndUpdate(
     { _id: categoryId },
-    { ...req.body },
+    { ...req.body, image },
     { new: true, runValidators: true }
   );
   if (!category) throw new AppError("Category not found", 404);
