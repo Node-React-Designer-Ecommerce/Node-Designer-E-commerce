@@ -26,7 +26,7 @@ const productSchema = new mongoose.Schema(
     canvasWidth: Number,
     canvasHeight: Number,
     category: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
     },
   },
