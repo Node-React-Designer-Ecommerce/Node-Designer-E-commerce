@@ -1,12 +1,20 @@
 const AppError = require("../Utils/AppError");
 const Product = require("../Models/productModel");
+const APIFeatures = require("../Utils/APIFeatures");
 
 // 1- get all products
 exports.getAllProduct = async (req, res, next) => {
-  const products = await Product.find();
-  if (!products) {
-    throw new AppError("No products found", 404);
-  }
+  // const products = await Product.find();
+  // if (!products) {
+  //   throw new AppError("No products found", 404);
+  // }
+  const features = new APIFeatures(Product.find(), req.query)
+    .filter()
+    .sort()
+    .paginate()
+    .search(); // Add search functionality
+
+  const products = await features.query; // Execute the query
   res.status(200).send({
     status: "success",
     message: "Products Retreived Successfully",
