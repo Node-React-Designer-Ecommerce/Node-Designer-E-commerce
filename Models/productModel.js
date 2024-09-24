@@ -25,6 +25,10 @@ const productSchema = new mongoose.Schema(
     },
     canvasWidth: Number,
     canvasHeight: Number,
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+    },
   },
   {
     timestamps: true,
