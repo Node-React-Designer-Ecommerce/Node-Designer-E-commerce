@@ -9,6 +9,7 @@ require("express-async-errors");
 const userRouter = require("./Routes/userRouter");
 const designRouter = require("./Routes/designRouter");
 const productRouter = require("./Routes/productRouter");
+const categoryRouter = require("./Routes/categoryRouter");
 // Custom Error Class
 const AppError = require("./Utils/AppError");
 // Logger
@@ -30,6 +31,7 @@ app.use(express.json());
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/designs", designRouter);
 app.use("/api/v1/products", productRouter);
+app.use("/api/v1/categories", categoryRouter);
 
 // Welcome Route
 app.get("/", (req, res) => {
