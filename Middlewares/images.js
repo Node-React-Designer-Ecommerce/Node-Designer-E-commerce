@@ -4,10 +4,15 @@ const ImageKit = require("imagekit");
 
 // Configure ImageKit
 const imagekit = new ImageKit({
-  publicKey: "public_w8ASlEoPSOHndZrys4vBy204R24=",
-  privateKey: "private_v7YAUPQt47lo9CNLiJPas2qScaQ=",
-  urlEndpoint: "https://ik.imagekit.io/shadyyd",
+  publicKey: process.env.IMAGE_KIT_PUBLIC_KEY,
+  privateKey: process.env.IMAGE_KIT_PRIVATE_KEY,
+  urlEndpoint: process.env.IMAGE_KIT_URL_ENDPOINT,
 });
+// const imagekit = new ImageKit({
+//   publicKey: "public_w8ASlEoPSOHndZrys4vBy204R24=",
+//   privateKey: "private_v7YAUPQt47lo9CNLiJPas2qScaQ=",
+//   urlEndpoint: "https://ik.imagekit.io/shadyyd",
+// });
 
 // Multer storage configuration to keep files in memory
 const multerStorage = multer.memoryStorage();
