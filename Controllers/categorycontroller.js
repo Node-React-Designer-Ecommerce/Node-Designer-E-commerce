@@ -1,5 +1,13 @@
 const AppError = require("../Utils/AppError");
 const Category = require("../Models/categoryModel");
+const joi = require("joi");
+
+///// Validate ////
+
+const categorySchema = joi.object({
+  name: joi.string().required(),
+  description: joi.string().required().min(30).max(100),
+});
 
 ///1- Get all Categories ///
 
@@ -29,6 +37,13 @@ exports.getCategoryById = async (req, res, next) => {
 ///3- Add Category ///
 
 exports.addCategory = async (req, res, next) => {
+  const { error } = categorySchema.validate(req.body);
+  if (error) {
+    return res.status(400).send({
+      status: "fail",
+      message: error.details[0].message,
+    });
+  }
   let image;
   if (req.body.image) image = req.body.image[0];
   const newCategory = await Category.create({ ...req.body, image });
@@ -44,9 +59,9 @@ exports.addCategory = async (req, res, next) => {
 
 exports.updateCategroy = async (req, res, next) => {
   let image;
-    if (req.body.image) image = req.body.image[0];
-    const categoryId = req.params.id;
-    const category = await Category.findByIdAndUpdate(
+  if (req.body.image) image = req.body.image[0];
+  const categoryId = req.params.id;
+  const category = await Category.findByIdAndUpdate(
     { _id: categoryId },
     { ...req.body },
     { new: true, runValidators: true }
