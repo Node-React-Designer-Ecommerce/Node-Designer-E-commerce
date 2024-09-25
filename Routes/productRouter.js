@@ -5,14 +5,15 @@ const {
   updateProduct,
   deleteProduct,
   addNewProduct,
-  getDesignableProducts
+  getDesignableProducts,
+  getDesignableProductById,
 } = require("../Controllers/productController");
 const { restrictTo, auth } = require("../Middlewares/authMiddleware");
 const { uploadImages, handleImages } = require("../Middlewares/images");
 const router = Router();
 router.get("/", getAllProduct);
-router.get("/designable-products", getDesignableProducts
-);
+router.get("/designable-products", getDesignableProducts);
+router.get("/designable-products/:id", getDesignableProductById);
 router.get("/:id", getProductById);
 router.post(
   "/",

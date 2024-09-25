@@ -90,3 +90,17 @@ exports.getDesignableProducts = async (req, res, next) => {
     data: { products },
   });
 };
+
+// 7- designable product by id
+exports.getDesignableProductById = async (req, res, next) => {
+  const designableProductId = req.params.id;
+  const designableProduct = await Product.findById(designableProductId);
+  if (!designableProduct) {
+    throw new AppError("No product found with this id ", 404);
+  }
+  res.status(200).send({
+    status: "success",
+    message: "Product Retreived Successfully",
+    data: { designableProduct },
+  });
+};
