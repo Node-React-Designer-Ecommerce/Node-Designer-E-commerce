@@ -7,6 +7,9 @@ const {
   updateUser,
   login,
   getLoggedInUser,
+  updatePassword,
+  forgotPassword,
+  resetPassword,
 } = require("./../Controllers/userController");
 const { restrictTo, auth } = require("../Middlewares/authMiddleware");
 
@@ -18,6 +21,8 @@ router.post("/signup", signup);
 router.post("/login", login);
 router.get("/:id", auth, getUserById);
 router.delete("/:id", auth, restrictTo("admin"), deleteUser);
+router.patch("/update-password", auth, updatePassword);
+router.patch("/reset-password/:token", resetPassword);
 router.patch("/:id", auth, restrictTo("user"), updateUser);
-
+router.post("/forgot-password", forgotPassword);
 module.exports = router;
