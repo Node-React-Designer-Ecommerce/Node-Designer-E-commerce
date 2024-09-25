@@ -3,6 +3,8 @@ const User = require("./../Models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const Joi = require("joi");
+const Email = require("../Utils/email");
+const crypto = require("crypto");
 
 // Joi schema for user signup
 const signupSchema = Joi.object({
@@ -100,6 +102,10 @@ exports.signup = async (req, res, next) => {
     passwordConfirm: undefined,
   });
   newUser.password = undefined;
+
+  const url = `${req.protocol}://${req.get("host")}/me`;
+  await new Email(newUser, url).sendWelcome();
+
   res.status(201).send({
     status: "success",
     message: "User Created Successfully",
@@ -168,5 +174,89 @@ exports.getLoggedInUser = async (req, res) => {
     status: "success",
     message: "User Retreived Successfully",
     data: { user: req.user },
+  });
+};
+
+exports.forgotPassword = async (req, res, next) => {
+  // 1) Get user based on POSTed email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    throw new AppError("there is no user with this email address", 404);
+  }
+  // 2) Generate the random reset token
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+  // 3) Send it to user's email
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/users/reset-password/${resetToken}`;
+  await new Email(user, resetURL).sendPasswordreset();
+
+  res.status(200).send({
+    status: "success",
+    message: "Token sent to email!",
+  });
+};
+
+exports.resetPassword = async (req, res, next) => {
+  //TODO add validation
+
+  // 1) Check if passwords match
+  if (req.body.password !== req.body.passwordConfirm) {
+    throw new AppError("Passwords do not match", 400);
+  }
+  // 2) Get user based on the token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  // 3) If token has not expired , and there is user , set the new password
+  if (!user) {
+    throw new AppError("Token invalid or has expired", 400);
+  }
+  // 4) update changedPassswordAt property for the user
+  const hashedPassword = await bcrypt.hash(req.body.password, 8);
+
+  user.password = hashedPassword;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Password reset successful",
+  });
+};
+
+// ----------------update password ------------------------------
+exports.updatePassword = async (req, res, next) => {
+  //add validaion
+  const { password, passwordConfirm, oldPassword } = req.body;
+
+  if (password !== passwordConfirm) {
+    throw new AppError("Passwords do not match", 400);
+  }
+  console.log(req.user._id);
+
+  const user = await User.findById(req.user._id).select("+password");
+
+  const matched = await bcrypt.compare(oldPassword, user.password);
+  if (!matched) {
+    throw new AppError("your current password is wrong.", 401);
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 8);
+
+  user.password = hashedPassword;
+  await user.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Password updated successfully",
   });
 };
