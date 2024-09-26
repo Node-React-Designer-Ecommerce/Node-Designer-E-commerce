@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
+const CartItem = require("./CartItem");
 
 const userSchema = new mongoose.Schema(
   {
@@ -28,12 +29,7 @@ const userSchema = new mongoose.Schema(
     passwordResetToken: String,
     passwordResetExpires: Date,
 
-    cart: [
-      {
-        cartItemId: { type: mongoose.Schema.Types.ObjectId, ref: "CartItem" },
-        quantity: { type: Number, default: 1 },
-      },
-    ],
+    cart: [CartItem.schema],
   },
   {
     timestamps: true,
