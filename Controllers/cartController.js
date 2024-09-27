@@ -66,6 +66,31 @@ exports.getCart = async (req, res) => {
   });
 };
 
+// Update an item in the user's cart
+exports.updateCartItem = async (req, res, next) => {
+    const cartItemId = req.params.id;
+    const { error } = cartItemSchema.validate(req.body);
+    if (error) {
+      return res.status(400).send({
+        status: "fail",
+        message: error.details[0].message,
+      });
+    }
+  
+    const updatedCartItem = await Cart.findByIdAndUpdate(
+      cartItemId,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!updatedCartItem) throw new AppError("Cart item not found", 404);
+    res.status(200).send({
+      status: "success",
+      message: "Cart item updated successfully",
+      data: { updatedCartItem },
+    });
+  };
+  
+
 // Remove an item from the cart
 exports.removeFromCart = async (req, res) => {
   const userId = req.user._id;
