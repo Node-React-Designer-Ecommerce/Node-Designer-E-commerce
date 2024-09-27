@@ -21,7 +21,7 @@ exports.auth = async (req, res, next) => {
 exports.restrictTo = (role) => {
   // role === admin
   return (req, res, next) => {
-    if (role !== req.user.role) {
+    if (role !== req.user?.role) {
       throw new AppError("You are not Authorized", 401);
     }
     next();
