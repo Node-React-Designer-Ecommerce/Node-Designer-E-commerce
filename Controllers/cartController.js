@@ -8,9 +8,14 @@ exports.addToCart = async (req, res) => {
   if (!req.user) {
     throw new AppError("User not found", 404);
   }
+  const cart = req.user.cart;
 
   if (quantity < 1) {
-    throw new AppError("quantity must be positve number", 400);
+    return res.status(200).send({
+      status: "Not-Modified",
+      message: "Item Quantity must be 1 or greater",
+      data: { cart },
+    });
   }
 
   // Find the product
@@ -19,22 +24,35 @@ exports.addToCart = async (req, res) => {
     throw new AppError("Product not found", 404);
   }
 
-  const cart = req.user.cart;
   // Check if the product already exists in the cart
   const existingCartItem = cart.find(
     (item) => item.product.toString() === productId && item.size === size
   );
   if (existingCartItem) {
-    throw new AppError("Item Alraedy in cart", 400);
+    return res.status(200).send({
+      status: "Not-Modified",
+      message: "Item Alread in cart",
+      data: { cart },
+    });
   }
 
   // Check if the product size is available
   const productStock = product.stock.find((el) => el.size === size);
   if (!productStock) {
-    throw new AppError("Product size is not available", 400);
+    // throw new AppError("Product size is not available", 400);
+    return res.status(200).send({
+      status: "Not-Modified",
+      message: "Product size is not available",
+      data: { cart },
+    });
   }
   if (productStock.quantity < quantity) {
-    throw new AppError("this quantity is not in stock", 400);
+    // throw new AppError("this quantity is not in stock", 400);
+    return res.status(200).send({
+      status: "Not-Modified",
+      message: "this quantity is not in stock",
+      data: { cart },
+    });
   }
 
   // Calculate the price
@@ -82,14 +100,17 @@ exports.updateCartItem = async (req, res, next) => {
   const { quantity } = req.body;
   const { cartItemId } = req.params;
 
-  if (quantity < 1) {
-    throw new AppError("Quantity must be greater than zero", 400);
-  }
-
   const user = req.user;
-
   if (!user) {
     throw new AppError("User not found", 404);
+  }
+
+  if (quantity < 1) {
+    return res.status(200).send({
+      status: "Not-Modified",
+      message: "Item Quantity must be 1 or greater",
+      data: { cart: user.cart },
+    });
   }
 
   const cartItem = user.cart.find(
@@ -101,17 +122,26 @@ exports.updateCartItem = async (req, res, next) => {
   }
   // Check if the product size is available
   const product = await Product.findById(cartItem.product);
-  console.log(product);
+  // console.log(product);
 
   if (!product) {
     throw new AppError("Product not found", 404);
   }
   const productStock = product.stock.find((el) => el.size === cartItem.size);
   if (!productStock) {
-    throw new AppError("Product size is not available", 400);
+    return res.status(200).send({
+      status: "Not-Modified",
+      message: "Product size is not available",
+      data: { cart: user.cart },
+    });
   }
   if (productStock.quantity < quantity) {
-    throw new AppError("This quantity is not in stock", 400);
+    // throw new AppError("This quantity is not in stock", 400);
+    return res.status(200).send({
+      status: "Not-Modified",
+      message: "This quantity is not in stock",
+      data: { cart: user.cart },
+    });
   }
   // Update the quantity
   cartItem.price = product.price * quantity;
@@ -119,6 +149,7 @@ exports.updateCartItem = async (req, res, next) => {
   await user.save();
 
   res.status(200).send({
+    status: "success",
     message: "Cart Item updated successfully",
     data: {
       cart: user.cart,
