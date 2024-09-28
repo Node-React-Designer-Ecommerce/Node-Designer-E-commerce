@@ -25,11 +25,7 @@ exports.addToCart = async (req, res) => {
     (item) => item.product.toString() === productId && item.size === size
   );
   if (existingCartItem) {
-    return res.send({
-      status: "no-change",
-      message: "Item Alraedy in cart",
-      data: { cart },
-    });
+    throw new AppError("Item Alraedy in cart", 400);
   }
 
   // Check if the product size is available
