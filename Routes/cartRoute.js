@@ -3,15 +3,18 @@ const router = express.Router();
 const cartController = require("../Controllers/cartController");
 const { auth, restrictTo } = require("../Middlewares/authMiddleware");
 
-router.post("/cart", auth, restrictTo("user"), cartController.addToCart);
+router.use(auth, restrictTo("user"));
 
-router.get("/cart", auth, restrictTo("user"), cartController.getCart);
+router.post("/", cartController.addToCart);
 
-router.delete(
-  "/cart/:cartItemId",
-  auth,
-  restrictTo("user"),
-  cartController.removeFromCart
-);
+router.get("/", cartController.getCart);
+
+router.delete("/:cartItemId", cartController.removeFromCart);
+
+router.patch("/:cartItemId", cartController.updateCartItem);
+
+router.post("/set", cartController.setCart);
+
+router.delete("/", cartController.clearCart);
 
 module.exports = router;

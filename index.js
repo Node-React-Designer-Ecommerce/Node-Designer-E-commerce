@@ -29,11 +29,15 @@ app.use(express.json());
 
 // Use Routes
 // ---------------------
-app.use("/api/v1/users", userRouter);
-app.use("/api/v1/designs", designRouter);
-app.use("/api/v1/products", productRouter);
-app.use("/api/v1/categories", categoryRouter);
-app.use("/api/v1/user", cartRouter);
+const mainRouter = express.Router();
+
+mainRouter.use("/users", userRouter);
+mainRouter.use("/designs", designRouter);
+mainRouter.use("/products", productRouter);
+mainRouter.use("/categories", categoryRouter);
+mainRouter.use("/cart", cartRouter);
+
+app.use("/api/v1", mainRouter);
 
 // Welcome Route
 app.get("/", (req, res) => {
