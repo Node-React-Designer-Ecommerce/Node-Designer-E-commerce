@@ -58,10 +58,18 @@ exports.addToCart = async (req, res) => {
 
 // Get all items in the user's cart
 exports.getCart = async (req, res) => {
-  const cart = req.user.cart;
-  if (!cart) {
+  if (!req.user) {
     throw new AppError("User not found", 404);
   }
+
+  // Populate the product details in the cart
+  await req.user.populate({
+    path: "cart.product",
+    model: "Product",
+    select: "name image price stock", // Include only necessary fields
+  });
+
+  const cart = req.user.cart;
   res.status(200).send({
     status: "success",
     message: "Cart retrieved successfully",
