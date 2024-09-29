@@ -30,7 +30,9 @@ exports.getDesignById = async (req, res, next) => {
 
 // 3- create new design
 exports.createDesign = async (req, res, next) => {
-  const design = await Design.create({ ...req.body });
+  let image;
+  if (req.body.image) image = req.body.image[0];
+  const design = await Design.create({ ...req.body, image });
   if (!design) {
     throw new AppError("Error creating design", 400);
   }

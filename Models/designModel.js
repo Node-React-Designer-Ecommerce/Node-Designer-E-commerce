@@ -18,6 +18,9 @@ const designSchema = new mongoose.Schema(
     isGamed: {
       type: Boolean,
     },
+    image: {
+      type: String,
+    },
   },
   {
     timestamps: true,
