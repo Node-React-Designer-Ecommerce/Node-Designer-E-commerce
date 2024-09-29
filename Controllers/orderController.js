@@ -4,6 +4,7 @@ const queryString = require("query-string");
 const _ = require("underscore");
 
 const AppError = require("../Utils/AppError");
+const logger = require("../Utils/logger");
 
 function generateKashierOrderHash(amount, orderId) {
   const mid = "MID-28559-7"; //your merchant id
@@ -55,16 +56,35 @@ exports.createOrder = async (req, res, next) => {
 
 exports.webhook = async (req, res) => {
   const { data, event } = req.body;
+  console.log("kashier webhook request");
+  console.log("orderId:", data.merchantOrderId);
+  console.log("orderStatus:", data.status);
+  console.log("----------------------------------");
   data.signatureKeys.sort();
   const objectSignaturePayload = _.pick(data, data.signatureKeys);
   const signaturePayload = queryString.stringify(objectSignaturePayload);
   const signature = crypto
-    .createHmac("sha256", PaymentApiKey)
+    .createHmac("sha256", "ca770d42-0660-4917-b7c5-50e128f000c6")
     .update(signaturePayload)
     .digest("hex");
   const kashierSignature = req.header("x-kashier-signature");
   if (kashierSignature === signature) {
     console.log("valid signature");
+    const order = await Order.findById(data.merchantOrderId);
+    if (!order) {
+      console.log("order not found");
+      return res.status(200).send();
+    }
+    if (data.status === "SUCCESS") {
+      order.paymentStatus = "Completed";
+      order.orderStatus = "Completed";
+    } else {
+      order.paymentStatus = "Failed";
+      order.orderStatus = "Rejected";
+    }
+    logger.info("order:", order._id, "updated to:", order.orderStatus);
+    await order.save();
+    res.status(200).send();
   } else {
     console.log("invalid signature");
   }
