@@ -5,6 +5,7 @@ const _ = require("underscore");
 
 const AppError = require("../Utils/AppError");
 const logger = require("../Utils/logger");
+const User = require("../Models/userModel");
 
 function generateKashierOrderHash(amount, orderId) {
   const mid = "MID-28559-7"; //your merchant id
@@ -71,6 +72,11 @@ exports.webhook = async (req, res) => {
   if (kashierSignature === signature) {
     console.log("valid signature");
     const order = await Order.findById(data.merchantOrderId);
+    const customer = User.findById(order.customer);
+    if (!customer) {
+      console.log("customer not found");
+      return res.status(200).send();
+    }
     if (!order) {
       console.log("order not found");
       return res.status(200).send();
@@ -78,6 +84,8 @@ exports.webhook = async (req, res) => {
     if (data.status === "SUCCESS") {
       order.paymentStatus = "Completed";
       order.orderStatus = "Completed";
+      customer.cart = [];
+      await customer.save();
     } else {
       order.paymentStatus = "Failed";
       order.orderStatus = "Rejected";
