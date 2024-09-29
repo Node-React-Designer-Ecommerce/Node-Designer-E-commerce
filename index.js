@@ -11,6 +11,7 @@ const designRouter = require("./Routes/designRouter");
 const productRouter = require("./Routes/productRouter");
 const categoryRouter = require("./Routes/categoryRouter");
 const cartRouter = require("./Routes/cartRoute");
+const orderRouter = require("./Routes/orderRouter");
 // Custom Error Class
 const AppError = require("./Utils/AppError");
 // Logger
@@ -36,6 +37,7 @@ mainRouter.use("/designs", designRouter);
 mainRouter.use("/products", productRouter);
 mainRouter.use("/categories", categoryRouter);
 mainRouter.use("/cart", cartRouter);
+mainRouter.use("/orders", orderRouter);
 
 app.use("/api/v1", mainRouter);
 
