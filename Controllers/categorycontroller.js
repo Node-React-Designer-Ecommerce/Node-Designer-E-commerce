@@ -1,13 +1,7 @@
 const AppError = require("../Utils/AppError");
 const Category = require("../Models/categoryModel");
-const joi = require("joi");
+const categorySchema = require("../Validations/categoriesSchemas");
 
-///// Validate ////
-
-const categorySchema = joi.object({
-  name: joi.string().required(),
-  description: joi.string().required().min(30).max(100),
-});
 
 ///1- Get all Categories ///
 
