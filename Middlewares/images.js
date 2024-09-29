@@ -25,6 +25,9 @@ const multerFilterImage = (req, file, cb) => {
 const upload = multer({
   storage: multerStorage,
   fileFilter: multerFilterImage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB limit
+  },
 });
 
 // Middleware to upload images using Multer
