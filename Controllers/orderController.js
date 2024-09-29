@@ -49,3 +49,20 @@ exports.createOrder = async (req, res, next) => {
     data: { order, kashierOrderHash },
   });
 };
+
+exports.webhook = async (req, res) => {
+  const { data, event } = req.body;
+  data.signatureKeys.sort();
+  const objectSignaturePayload = _.pick(data, data.signatureKeys);
+  const signaturePayload = queryString.stringify(objectSignaturePayload);
+  const signature = crypto
+    .createHmac("sha256", PaymentApiKey)
+    .update(signaturePayload)
+    .digest("hex");
+  const kashierSignature = req.header("x-kashier-signature");
+  if (kashierSignature === signature) {
+    console.log("valid signature");
+  } else {
+    console.log("invalid signature");
+  }
+};
