@@ -4,21 +4,35 @@ const APIFeatures = require("../Utils/APIFeatures");
 
 // 1- get all products
 exports.getAllProduct = async (req, res, next) => {
-  // const products = await Product.find();
-  // if (!products) {
-  //   throw new AppError("No products found", 404);
-  // }
   const features = new APIFeatures(Product.find(), req.query)
     .filter()
     .sort()
     .paginate()
-    .search(); // Add search functionality
+    .search();
 
   const products = await features.query; // Execute the query
+
+  const page = req.query.page * 1 || 1; // Current page number, default is 1
+  const limit = req.query.limit * 1 || 8; // Number of items per page, default is 8
+  const totalProducts = await Product.countDocuments(); // Total number of products in the collection
+  const totalPages = Math.ceil(totalProducts / limit); // Calculate total pages
+
+  const prevPage = page > 1 ? page - 1 : null;
+  const nextPage = page < totalPages ? page + 1 : null;
   res.status(200).send({
     status: "success",
     message: "Products Retreived Successfully",
-    data: { products },
+    data: {
+      products,
+      pagination: {
+        page,
+        limit,
+        totalProducts,
+        totalPages,
+        prevPage,
+        nextPage,
+      },
+    },
   });
 };
 // 2- get one product by id
