@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
 const CartItem = require("./CartItem");
+const Product = require("./productModel");
 
 const userSchema = new mongoose.Schema(
   {
@@ -30,6 +31,7 @@ const userSchema = new mongoose.Schema(
     passwordResetExpires: Date,
 
     cart: [CartItem.schema],
+    favProducts: [Product.schema],
   },
   {
     timestamps: true,

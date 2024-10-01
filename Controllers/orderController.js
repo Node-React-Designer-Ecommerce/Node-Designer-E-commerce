@@ -72,7 +72,7 @@ exports.webhook = async (req, res) => {
   if (kashierSignature === signature) {
     console.log("valid signature");
     const order = await Order.findById(data.merchantOrderId);
-    const customer = User.findById(order.customer);
+    const customer = await User.findById(order.customer);
     if (!customer) {
       console.log("customer not found");
       return res.status(200).send();
