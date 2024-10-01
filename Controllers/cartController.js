@@ -1,9 +1,10 @@
 const Product = require("../Models/productModel");
+const Design = require("./../Models/designModel");
 const AppError = require("../Utils/AppError");
 
 // Add an item to the user's cart
 exports.addToCart = async (req, res) => {
-  const { productId, quantity, size } = req.body;
+  let { productId, quantity, size, type, designId } = req.body;
 
   if (!req.user) {
     throw new AppError("User not found", 404);
@@ -17,17 +18,37 @@ exports.addToCart = async (req, res) => {
       data: { cart },
     });
   }
+  let design;
+  if (type === "Design") {
+    design = await Design.findById(designId);
+    if (!design) {
+      throw new AppError("Design not found", 404);
+    }
+    console.log(design);
+
+    productId = design.productId;
+  }
+
+  const product = await Product.findById(productId);
 
   // Find the product
-  const product = await Product.findById(productId);
   if (!product) {
     throw new AppError("Product not found", 404);
   }
 
   // Check if the product already exists in the cart
-  const existingCartItem = cart.find(
-    (item) => item.product.toString() === productId && item.size === size
-  );
+  let existingCartItem;
+
+  if (type === "Product") {
+    existingCartItem = cart.find(
+      (item) => item?.product?.toString() === productId && item.size === size
+    );
+  } else if (type === "Design") {
+    existingCartItem = cart.find(
+      (item) => item?.design?.toString() === designId && item.size === size
+    );
+  }
+
   if (existingCartItem) {
     return res.status(200).send({
       status: "Not-Modified",
@@ -56,11 +77,18 @@ exports.addToCart = async (req, res) => {
   }
 
   // Calculate the price
-  const price = product.price * quantity;
+  let price;
+  if (type === "Product") {
+    price = product.price * quantity;
+  } else if (type === "Design") {
+    price = design.totalPrice * quantity;
+  }
 
   // Add the item to the cart
   cart.push({
-    product: product._id,
+    product: productId,
+    design: designId,
+    type,
     quantity,
     price,
     size,
@@ -81,10 +109,23 @@ exports.getCart = async (req, res) => {
   }
 
   // Populate the product details in the cart
+  // await req.user.populate({
+  //   path: "cart.product",
+  //   model: "Product",
+  //   select: "name image price stock", // Include only necessary fields
+  // });
+
   await req.user.populate({
     path: "cart.product",
     model: "Product",
-    select: "name image price stock", // Include only necessary fields
+    select: "name image price stock", // Only include necessary fields
+  });
+
+  // Populate the design details in the cart (if present)
+  await req.user.populate({
+    path: "cart.design",
+    model: "Design",
+    // select: "image price", // Specify fields for Design if needed
   });
 
   const cart = req.user.cart;
@@ -144,7 +185,15 @@ exports.updateCartItem = async (req, res, next) => {
     });
   }
   // Update the quantity
-  cartItem.price = product.price * quantity;
+  if (cartItem.type === "Product") {
+    cartItem.price = product.price * quantity;
+  } else if (cartItem.type === "Design") {
+    const design = await Design.findById(cartItem.design);
+    if (!design) {
+      throw new AppError("Design not found", 404);
+    }
+    cartItem.price = design.totalPrice * quantity;
+  }
   cartItem.quantity = quantity;
   await user.save();
 
@@ -159,7 +208,6 @@ exports.updateCartItem = async (req, res, next) => {
 
 // Remove an item from the cart
 exports.removeFromCart = async (req, res) => {
-  const userId = req.user._id;
   const { cartItemId } = req.params;
   const user = req.user;
   if (!user) {
@@ -181,25 +229,25 @@ exports.removeFromCart = async (req, res) => {
   });
 };
 
-exports.setCart = async (req, res, next) => {
-  const { cart } = req.body;
+// exports.setCart = async (req, res, next) => {
+//   const { cart } = req.body;
 
-  const user = req.user;
+//   const user = req.user;
 
-  if (!user) {
-    throw new AppError("user not found", 404);
-  }
+//   if (!user) {
+//     throw new AppError("user not found", 404);
+//   }
 
-  user.cart = cart.map((prod) => ({ ...prod }));
+//   user.cart = cart.map((prod) => ({ ...prod }));
 
-  await user.save();
+//   await user.save();
 
-  res.status(200).send({
-    status: "success",
-    message: "cart merged successfully",
-    data: { cart: user.cart },
-  });
-};
+//   res.status(200).send({
+//     status: "success",
+//     message: "cart merged successfully",
+//     data: { cart: user.cart },
+//   });
+// };
 
 exports.clearCart = async (req, res, next) => {
   const user = req.user;

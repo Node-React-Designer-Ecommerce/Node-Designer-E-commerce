@@ -10,7 +10,7 @@ const userRouter = require("./Routes/userRouter");
 const designRouter = require("./Routes/designRouter");
 const productRouter = require("./Routes/productRouter");
 const categoryRouter = require("./Routes/categoryRouter");
-const cartRouter = require("./Routes/cartRoute");
+const cartRouter = require("./Routes/cartRouter");
 const orderRouter = require("./Routes/orderRouter");
 const favRouter = require("./Routes/favProductsRouter");
 // Custom Error Class

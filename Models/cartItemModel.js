@@ -4,6 +4,14 @@ const cartItemSchema = new mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
+  },
+  design: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Design",
+  },
+  type: {
+    type: String,
+    enum: ["Product", "Design"],
     required: true,
   },
   quantity: {
@@ -14,7 +22,7 @@ const cartItemSchema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    required: true,
+    // required: true,
   },
   size: {
     type: String,

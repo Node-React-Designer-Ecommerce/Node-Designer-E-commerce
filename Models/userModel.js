@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const crypto = require("crypto");
-const CartItem = require("./CartItem");
-const Product = require("./productModel");
+const CartItem = require("./cartItemModel");
 
 const userSchema = new mongoose.Schema(
   {
