@@ -6,12 +6,7 @@ const {
 } = require("../Controllers/favProductsController");
 const router = Router();
 
-router.patch(
-  "/products/:productId/fav",
-  auth,
-  restrictTo("user"),
-  toggleFavoriteProduct
-);
-router.get("/favProducts", auth, restrictTo("user"), getFavoriteProducts);
+router.post("/:id", auth, restrictTo("user"), toggleFavoriteProduct);
+router.get("/", auth, restrictTo("user"), getFavoriteProducts);
 
 module.exports = router;
