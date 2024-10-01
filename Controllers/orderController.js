@@ -97,3 +97,20 @@ exports.webhook = async (req, res) => {
     console.log("invalid signature");
   }
 };
+exports.getUserOrders = async (req, res, next) => {
+  const orders = await Order.find({ customer: req.user._id });
+  res.status(200).send({
+    status: "success",
+    message: "Orders get successfully",
+    data: { orders },
+  });
+};
+
+exports.getOrders = async (req, res, next) => {
+  const orders = await Order.find();
+  res.status(200).send({
+    status: "success",
+    message: "Orders get successfully",
+    data: { orders },
+  });
+};

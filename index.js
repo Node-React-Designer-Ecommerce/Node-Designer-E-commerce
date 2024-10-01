@@ -39,7 +39,7 @@ mainRouter.use("/products", productRouter);
 mainRouter.use("/categories", categoryRouter);
 mainRouter.use("/cart", cartRouter);
 mainRouter.use("/orders", orderRouter);
-mainRouter.use("/", favRouter);
+mainRouter.use("/favorite", favRouter);
 
 app.use("/api/v1", mainRouter);
 

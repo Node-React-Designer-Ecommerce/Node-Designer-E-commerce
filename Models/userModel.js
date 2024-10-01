@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
     passwordResetExpires: Date,
 
     cart: [CartItem.schema],
-    favProducts: [Product.schema],
+    favProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   },
   {
     timestamps: true,
