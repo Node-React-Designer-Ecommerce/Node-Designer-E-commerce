@@ -13,6 +13,17 @@ exports.getAllDesigns = async (req, res, next) => {
     data: { designs },
   });
 };
+exports.getUserDesigns = async (req, res, next) => {
+  const designs = await Design.find({ userId: req.user._id });
+  if (!designs) {
+    throw new AppError("No designs found", 404);
+  }
+  res.status(200).send({
+    status: "sucsess",
+    message: "Designs Retreived Successfully",
+    data: { designs },
+  });
+};
 
 // 2- get one design by id
 exports.getDesignById = async (req, res, next) => {

@@ -5,13 +5,14 @@ const {
   getDesignById,
   updateDesign,
   deleteDesign,
+  getUserDesigns,
 } = require("../Controllers/designController");
 const { restrictTo, auth } = require("../Middlewares/authMiddleware");
 const { uploadImages, handleImages } = require("../Middlewares/images");
 
 const router = Router();
 router.get("/", getAllDesigns);
-router.get("/:id", getDesignById);
+
 router.post(
   "/",
   auth,
@@ -20,6 +21,9 @@ router.post(
   handleImages("image"),
   createDesign
 );
+
+router.get("/me", auth, restrictTo("user"), getUserDesigns);
+router.get("/:id", getDesignById);
 router.patch("/:id", auth, restrictTo("user"), updateDesign);
 router.delete("/:id", auth, restrictTo("user"), deleteDesign);
 
