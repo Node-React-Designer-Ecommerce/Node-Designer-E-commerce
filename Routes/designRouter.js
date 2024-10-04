@@ -17,8 +17,13 @@ router.post(
   "/",
   auth,
   restrictTo("user"),
-  uploadImages([{ name: "image", count: 1 }]),
+  uploadImages([
+    { name: "image", count: 1 },
+    { name: "dragImages", count: 5 },
+  ]),
+
   handleImages("image"),
+  handleImages("dragImages"),
   createDesign
 );
 

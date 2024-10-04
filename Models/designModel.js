@@ -21,6 +21,7 @@ const designSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    dragImages: [String],
   },
   {
     timestamps: true,
