@@ -47,6 +47,7 @@ exports.createDesign = async (req, res, next) => {
     ...req.body,
     userId: req.user._id,
     image,
+    dragImages: req.body.dragImages || [],
   });
   if (!design) {
     throw new AppError("Error creating design", 400);
