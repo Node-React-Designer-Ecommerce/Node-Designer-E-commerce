@@ -107,7 +107,12 @@ exports.getUserOrders = async (req, res, next) => {
 };
 
 exports.getOrders = async (req, res, next) => {
-  const orders = await Order.find();
+  const orders = await Order.find()
+    .populate({ path: "customer", select: "name email" })
+    .populate({
+      path: "items.product",
+      select: "name description image category",
+    });
   res.status(200).send({
     status: "success",
     message: "Orders get successfully",
