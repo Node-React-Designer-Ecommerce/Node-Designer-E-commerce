@@ -29,7 +29,19 @@ router.post(
 
 router.get("/me", auth, restrictTo("user"), getUserDesigns);
 router.get("/:id", getDesignById);
-router.patch("/:id", auth, restrictTo("user"), updateDesign);
+router.patch(
+  "/:id",
+  auth,
+  restrictTo("user"),
+  uploadImages([
+    { name: "image", count: 1 },
+    { name: "dragImages", count: 5 },
+  ]),
+
+  handleImages("image"),
+  handleImages("dragImages"),
+  updateDesign
+);
 router.delete("/:id", auth, restrictTo("user"), deleteDesign);
 
 module.exports = router;

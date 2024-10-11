@@ -65,10 +65,12 @@ exports.createDesign = async (req, res, next) => {
 
 exports.updateDesign = async (req, res, next) => {
   const designId = req.params.id;
+  let image;
+  if (req.body.image) image = req.body.image[0];
 
   const design = await Design.findByIdAndUpdate(
     { _id: designId },
-    { ...req.body },
+    { ...req.body, image, dragImages: req.body.dragImages || [] },
     { new: true, runValidators: true }
   );
   res.status(200).send({
