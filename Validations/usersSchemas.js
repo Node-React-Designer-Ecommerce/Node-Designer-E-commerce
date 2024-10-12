@@ -4,11 +4,15 @@ const signupSchema = Joi.object({
   name: Joi.string().min(3).max(50).required(),
   email: Joi.string().email().required(),
   address: Joi.string().min(3).max(100).required(),
+  phone: Joi.string()
+    .pattern(/^01[0125][0-9]{8}$/).required()
+    .messages({
+      "string.pattern.base": "Phone number must be a valid Egyptian number.",
+    }),
   password: Joi.string()
     .min(8)
     .max(30)
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,20}$/)
-
     .required()
     .messages({
       "string.pattern.base":
@@ -83,5 +87,5 @@ module.exports = {
   signupSchema,
   loginSchema,
   resetPasswordSchema,
-  changePasswordSchema
+  changePasswordSchema,
 };

@@ -33,6 +33,7 @@ exports.getUserById = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
   // Validate request body with Joi
+  console.log(req.body)
   const { error } = signupSchema.validate(req.body, { abortEarly: false });
   if (error) {
     const errorMessages = error.details
@@ -40,7 +41,7 @@ exports.signup = async (req, res, next) => {
       .join(", ");
     return next(new AppError(errorMessages, 400));
   }
-  const { name, email, address, password, passwordConfirm } = req.body;
+  const { name, email, address, phone , password, passwordConfirm } = req.body;
   //check if password matches passwordConfirm
   if (passwordConfirm !== password) {
     throw new AppError("Passwords do not match", 400);
@@ -61,6 +62,7 @@ exports.signup = async (req, res, next) => {
     email,
     role: "user",
     address,
+    phone,
     password: hashedPassword,
     passwordConfirm: undefined,
   });
