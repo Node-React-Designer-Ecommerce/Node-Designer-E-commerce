@@ -4,7 +4,12 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const Email = require("../Utils/email");
 const crypto = require("crypto");
-const { signupSchema, loginSchema, changePasswordSchema, resetPasswordSchema } = require("./../Validations/usersSchemas");
+const {
+  signupSchema,
+  loginSchema,
+  changePasswordSchema,
+  resetPasswordSchema,
+} = require("./../Validations/usersSchemas");
 
 exports.getUsers = async (req, res, next) => {
   const users = await User.find();
@@ -33,7 +38,7 @@ exports.getUserById = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
   // Validate request body with Joi
-  console.log(req.body)
+  console.log(req.body);
   const { error } = signupSchema.validate(req.body, { abortEarly: false });
   if (error) {
     const errorMessages = error.details
@@ -41,7 +46,7 @@ exports.signup = async (req, res, next) => {
       .join(", ");
     return next(new AppError(errorMessages, 400));
   }
-  const { name, email, address, phone , password, passwordConfirm } = req.body;
+  const { name, email, address, phone, password, passwordConfirm } = req.body;
   //check if password matches passwordConfirm
   if (passwordConfirm !== password) {
     throw new AppError("Passwords do not match", 400);
@@ -92,10 +97,10 @@ exports.deleteUser = async (req, res, next) => {
 
 exports.updateUser = async (req, res, next) => {
   const userId = req.params.id;
-  const { name, email, address } = req.body;
+  const { name, address, phone } = req.body;
   const updatedUser = await User.findByIdAndUpdate(
     userId,
-    { name, email, address },
+    { name, address, phone },
     {
       new: true,
     }
@@ -111,7 +116,7 @@ exports.updateUser = async (req, res, next) => {
 };
 
 exports.login = async (req, res, next) => {
-  const { error } = loginSchema.validate(req.body, {abortEarly: false});
+  const { error } = loginSchema.validate(req.body, { abortEarly: false });
   if (error) {
     const errorMessages = error.details
       .map((detail) => detail.message)
@@ -169,12 +174,14 @@ exports.forgotPassword = async (req, res, next) => {
 };
 
 exports.resetPassword = async (req, res, next) => {
-  const { error } = resetPasswordSchema.validate(req.body, {abortEarly: false});
-  if(error) {
+  const { error } = resetPasswordSchema.validate(req.body, {
+    abortEarly: false,
+  });
+  if (error) {
     const errorMessages = error.details
-    .map((detail) => detail.message)
-    .join(", ");
-  return next(new AppError(errorMessages, 400));
+      .map((detail) => detail.message)
+      .join(", ");
+    return next(new AppError(errorMessages, 400));
   }
   // 1) Check if passwords match
   if (req.body.password !== req.body.passwordConfirm) {
@@ -210,12 +217,14 @@ exports.resetPassword = async (req, res, next) => {
 
 // ----------------update password ------------------------------
 exports.updatePassword = async (req, res, next) => {
-  const { error } = changePasswordSchema.validate(req.body, {abortEarly: false});
-  if(error) {
+  const { error } = changePasswordSchema.validate(req.body, {
+    abortEarly: false,
+  });
+  if (error) {
     const errorMessages = error.details
-    .map((detail) => detail.message)
-    .join(", ");
-    return next(new AppError(errorMessages, 400))
+      .map((detail) => detail.message)
+      .join(", ");
+    return next(new AppError(errorMessages, 400));
   }
   const { password, passwordConfirm, oldPassword } = req.body;
 
