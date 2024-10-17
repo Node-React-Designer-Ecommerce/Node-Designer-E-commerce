@@ -18,7 +18,7 @@ router.post(
   auth,
   restrictTo("user"),
   uploadImages([
-    { name: "image", count: 1 },
+    { name: "image", count: 2 },
     { name: "dragImages", count: 5 },
   ]),
 
@@ -34,7 +34,7 @@ router.patch(
   auth,
   restrictTo("user"),
   uploadImages([
-    { name: "image", count: 1 },
+    { name: "image", count: 2 },
     { name: "dragImages", count: 5 },
   ]),
 

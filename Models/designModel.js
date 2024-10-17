@@ -11,16 +11,24 @@ const designSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Users",
     },
-    canvas: {
-      type: String,
+    // canvas: {
+    //   type: String,
+    // },
+
+    canvases: {
+      front: { type: String },
+      back: { type: String },
     },
     totalPrice: Number,
     isGamed: {
       type: Boolean,
     },
     image: {
-      type: String,
+      type: [String], // Update to an array of strings
     },
+    //image: {
+    //  type: String,
+    // },
     dragImages: [String],
   },
   {
