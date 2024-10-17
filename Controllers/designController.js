@@ -41,15 +41,16 @@ exports.getDesignById = async (req, res, next) => {
 
 // 3- create new design
 exports.createDesign = async (req, res, next) => {
-  // let image;
-  // if (req.body.image) image = req.body.image[0];
+  //let image;
+  //if (req.body.image) image = req.body.image[0];
   const design = await Design.create({
     ...req.body,
     userId: req.user._id,
     //image,
     image: req.body.image || [],
     dragImages: req.body.dragImages || [],
-    canvases: req.body.canvases || { front: "", back: "" },
+    //canvases: req.body.canvases || { front: '', back: '' },
+    canvases: JSON.parse(req.body.canvases),
   });
   if (!design) {
     throw new AppError("Error creating design", 400);
