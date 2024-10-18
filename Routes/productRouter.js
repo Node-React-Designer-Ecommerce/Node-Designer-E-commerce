@@ -19,8 +19,12 @@ router.post(
   "/",
   auth,
   restrictTo("admin"),
-  uploadImages([{ name: "image", count: 1 }]),
+  uploadImages([
+    { name: "image", count: 1 },
+    { name: "backImage", count: 1 },
+  ]),
   handleImages("image"),
+  handleImages("backImage"),
   addNewProduct
 );
 router.patch("/:id", auth, restrictTo("admin"), updateProduct);

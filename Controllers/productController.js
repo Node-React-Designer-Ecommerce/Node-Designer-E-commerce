@@ -51,8 +51,12 @@ exports.getProductById = async (req, res, next) => {
 // 3- add new product
 exports.addNewProduct = async (req, res, next) => {
   let image;
+  let backImage;
+
   if (req.body.image) image = req.body.image[0];
-  const product = await Product.create({ ...req.body, image });
+  if (req.body.backImage) backImage = req.body.backImage[0];
+
+  const product = await Product.create({ ...req.body, image, backImage });
 
   if (!product) {
     throw new AppError("Error adding product", 400);

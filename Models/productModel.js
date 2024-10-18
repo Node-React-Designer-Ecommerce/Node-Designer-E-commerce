@@ -20,6 +20,10 @@ const productSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    backImage: {
+      type: String,
+    },
+
     isDesignable: {
       type: Boolean,
     },
