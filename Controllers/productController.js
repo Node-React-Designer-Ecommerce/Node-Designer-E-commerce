@@ -17,8 +17,11 @@ exports.getAllProduct = async (req, res, next) => {
   const totalProducts = await Product.countDocuments(); // Total number of products in the collection
   const totalPages = Math.ceil(totalProducts / limit); // Calculate total pages
 
-  const prevPage = page > 1 ? page - 1 : null;
-  const nextPage = page < totalPages ? page + 1 : null;
+  // const prevPage = page > 1 ? page - 1 : null;
+  // const nextPage = page < totalPages ? page + 1 : null;
+  const hasPrevPage = page > 1;
+  const hasNextPage = page < totalPages;
+
   res.status(200).send({
     status: "success",
     message: "Products Retreived Successfully",
@@ -29,8 +32,10 @@ exports.getAllProduct = async (req, res, next) => {
         limit,
         totalProducts,
         totalPages,
-        prevPage,
-        nextPage,
+        prevPage: hasPrevPage ? page - 1 : null,
+        nextPage: hasNextPage ? page + 1 : null,
+        prev: hasPrevPage, // true if there is a previous page
+        next: hasNextPage, // true if there is a next page
       },
     },
   });
