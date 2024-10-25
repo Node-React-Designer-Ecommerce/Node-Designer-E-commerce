@@ -77,6 +77,7 @@ exports.updateDesign = async (req, res, next) => {
       ...req.body,
       image: req.body.image || [],
       dragImages: req.body.dragImages || [],
+      canvases: JSON.parse(req.body.canvases),
     },
     { new: true, runValidators: true }
   );
@@ -90,8 +91,12 @@ exports.updateDesign = async (req, res, next) => {
 // 5- delete design by id
 
 exports.deleteDesign = async (req, res, next) => {
-  await Design.deleteOne({ _id: req.params.id });
-  res
-    .status(204)
-    .send({ status: "success", message: "design deleted successfully" });
+  const design = await Design.findOne({ _id: req.params.id });
+  design.userId = undefined;
+  await design.save();
+  res.status(200).send({
+    status: "success",
+    message: "design deleted successfully",
+    data: { design },
+  });
 };
