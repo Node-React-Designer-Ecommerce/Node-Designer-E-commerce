@@ -2,10 +2,13 @@ let crypto = require("crypto");
 const Order = require("./../Models/orderModel");
 const queryString = require("query-string");
 const _ = require("underscore");
+const Product = require("./../Models/productModel");
 
 const AppError = require("../Utils/AppError");
 const logger = require("../Utils/logger");
 const User = require("../Models/userModel");
+const { log } = require("winston");
+const { Console } = require("console");
 
 function generateKashierOrderHash(amount, orderId) {
   const mid = "MID-28559-7"; //your merchant id
@@ -82,6 +85,8 @@ exports.webhook = async (req, res) => {
       return res.status(200).send();
     }
     if (data.status === "SUCCESS") {
+      await updateProductsQuantitiy(order.items);
+      console.log("order completed");
       order.paymentStatus = "Completed";
       order.orderStatus = "Completed";
       customer.cart = [];
@@ -121,4 +126,22 @@ exports.getOrders = async (req, res, next) => {
     message: "Orders get successfully",
     data: { orders },
   });
+};
+
+const updateProductsQuantitiy = async (items) => {
+  const updatePromises = items.map(async (item) => {
+    const product = await Product.findById(item.product);
+    if (product) {
+      const stockIndex = product.stock.findIndex(
+        (stock) => stock.size === item.size
+      );
+      console.log(stockIndex);
+
+      if (stockIndex !== -1) {
+        product.stock[stockIndex].quantity -= item.quantity;
+        await product.save();
+      }
+    }
+  });
+  await Promise.all(updatePromises);
 };
