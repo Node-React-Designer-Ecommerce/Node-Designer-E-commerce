@@ -4,7 +4,10 @@ const APIFeatures = require("../Utils/APIFeatures");
 
 // 1- get all products
 exports.getAllProduct = async (req, res, next) => {
-  const features = new APIFeatures(Product.find(), req.query)
+  const features = new APIFeatures(
+    Product.find({ isDesignable: { $ne: true } }),
+    req.query
+  )
     .filter()
     .sort()
     .paginate()
