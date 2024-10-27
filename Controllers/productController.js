@@ -5,7 +5,7 @@ const APIFeatures = require("../Utils/APIFeatures");
 // 1- get all products
 exports.getAllProduct = async (req, res, next) => {
   const features = new APIFeatures(
-    Product.find({ isDesignable: { $ne: true } }),
+    Product.find({ isDesignable: { $ne: true }, inactive: { $ne: true } }),
     req.query
   )
     .filter()
@@ -98,8 +98,10 @@ exports.updateProduct = async (req, res, next) => {
 
 // 5- delete product by id
 exports.deleteProduct = async (req, res, next) => {
-  await Product.deleteOne({ _id: req.params.id });
-  res.status(204).send({
+  const product = await Product.findOne({ _id: req.params.id });
+  product.inactive = true;
+  await product.save();
+  res.status(200).send({
     status: "success",
     message: "product deleted successfully",
   });
