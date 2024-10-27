@@ -23,22 +23,25 @@ function generateKashierOrderHash(amount, orderId) {
 
 exports.createOrder = async (req, res, next) => {
   const { paymentMethod } = req.body;
-  if (!req.user.cart) {
+  const user = req.user;
+  if (!user.cart) {
     throw new AppError("Cart is empty", 400);
   }
-  const totalPrice = req?.user?.cart.reduce((acc, curr) => {
+  const totalPrice = user?.cart.reduce((acc, curr) => {
     return acc + curr.price;
   }, 0);
   const order = await Order.create({
-    customer: req.user._id,
+    customer: user._id,
     totalPrice,
-    items: req.user.cart,
+    items: user.cart,
     paymentMethod,
   });
   if (!order) {
     throw new AppError("Failed to create order");
   }
   if (paymentMethod === "COD") {
+    user.cart = [];
+    await user.save();
     return res.status(201).send({
       status: "success",
       message: "Order created successfully",
