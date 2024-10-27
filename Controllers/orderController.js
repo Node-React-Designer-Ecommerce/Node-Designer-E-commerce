@@ -131,6 +131,30 @@ exports.getOrders = async (req, res, next) => {
   });
 };
 
+exports.UpdateOrderStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const order = await Order.findById(id);
+  if (!order) {
+    throw new AppError("Order not found", 400);
+  }
+  if (status) {
+    await updateProductsQuantitiy(order.items);
+    order.paymentStatus = "Completed";
+    order.orderStatus = "Completed";
+  } else {
+    order.paymentStatus = "Failed";
+    order.orderStatus = "Rejected";
+  }
+  logger.info("order:", order._id, "updated to:", order.orderStatus);
+  await order.save();
+  res.status(200).send({
+    status: "success",
+    message: "Order status updated successfully",
+    data: { order },
+  });
+};
+
 const updateProductsQuantitiy = async (items) => {
   const updatePromises = items.map(async (item) => {
     const product = await Product.findById(item.product);
