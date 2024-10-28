@@ -5,7 +5,8 @@ const signupSchema = Joi.object({
   email: Joi.string().email().required(),
   address: Joi.string().min(3).max(100).required(),
   phone: Joi.string()
-    .pattern(/^01[0125][0-9]{8}$/).required()
+    .pattern(/^01[0125][0-9]{8}$/)
+    .required()
     .messages({
       "string.pattern.base": "Phone number must be a valid Egyptian number.",
     }),
@@ -41,7 +42,7 @@ const loginSchema = Joi.object({
 });
 
 const resetPasswordSchema = Joi.object({
-  newPassword: Joi.string()
+  password: Joi.string()
     .min(8)
     .max(30)
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,20}$/)
@@ -51,7 +52,7 @@ const resetPasswordSchema = Joi.object({
         "Password must contain at least one uppercase letter, one lowercase letter, one number.",
     }),
   passwordConfirm: Joi.string()
-    .valid(Joi.ref("newPassword"))
+    .valid(Joi.ref("password"))
     .required()
     .messages({ "any.only": "Passwords do not match" }),
 });
