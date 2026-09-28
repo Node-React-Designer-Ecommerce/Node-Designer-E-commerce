@@ -132,3 +132,28 @@ exports.getDesignableProductById = async (req, res, next) => {
     data: { designableProduct },
   });
 };
+
+exports.getRelatedProducts = async (req, res, next) => {
+  const productId = req.params.id;
+
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    throw new AppError("No product found with this id", 404);
+  }
+
+  const relatedProducts = await Product.find({
+    category: product.category,
+    _id: { $ne: productId },
+    isDesignable: { $ne: true },
+    inactive: { $ne: true },
+  }).limit(5);
+
+  res.status(200).send({
+    status: "success",
+    message: "Related products retrieved successfully",
+    data: {
+      products: relatedProducts,
+    },
+  });
+};

@@ -7,6 +7,7 @@ const {
   addNewProduct,
   getDesignableProducts,
   getDesignableProductById,
+  getRelatedProducts
 } = require("../Controllers/productController");
 const { restrictTo, auth } = require("../Middlewares/authMiddleware");
 const { uploadImages, handleImages } = require("../Middlewares/images");
@@ -44,5 +45,7 @@ router.patch(
   updateProduct,
 );
 router.delete("/:id", auth, restrictTo("admin"), deleteProduct);
+
+router.get("/:id/related", getRelatedProducts);
 
 module.exports = router;
