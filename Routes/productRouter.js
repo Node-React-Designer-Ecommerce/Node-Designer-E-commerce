@@ -11,7 +11,11 @@ const {
 } = require("../Controllers/productController");
 const { restrictTo, auth } = require("../Middlewares/authMiddleware");
 const { uploadImages, handleImages } = require("../Middlewares/images");
+const reviewRouter = require('./reviewRouter');
 const router = Router();
+
+
+router.use('/:productId/reviews', reviewRouter);
 router.get("/", getAllProduct);
 router.get("/designable-products", getDesignableProducts);
 router.get("/designable-products/:id", getDesignableProductById);

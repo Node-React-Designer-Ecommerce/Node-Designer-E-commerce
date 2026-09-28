@@ -9,6 +9,7 @@ require("express-async-errors");
 const userRouter = require("./Routes/userRouter");
 const designRouter = require("./Routes/designRouter");
 const productRouter = require("./Routes/productRouter");
+const reviewRouter = require("./Routes/reviewRouter");
 const categoryRouter = require("./Routes/categoryRouter");
 const cartRouter = require("./Routes/cartRouter");
 const orderRouter = require("./Routes/orderRouter");
@@ -36,6 +37,7 @@ const mainRouter = express.Router();
 mainRouter.use("/users", userRouter);
 mainRouter.use("/designs", designRouter);
 mainRouter.use("/products", productRouter);
+mainRouter.use("/reviews", reviewRouter);
 mainRouter.use("/categories", categoryRouter);
 mainRouter.use("/cart", cartRouter);
 mainRouter.use("/orders", orderRouter);
@@ -52,7 +54,7 @@ app.get("/", (req, res) => {
 app.all("/*", (req, res, next) => {
   throw new AppError(
     `Error : Can't find ${req.originalUrl} on this server!`,
-    404
+    404,
   );
 });
 
