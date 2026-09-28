@@ -22,12 +22,27 @@ router.post(
   uploadImages([
     { name: "image", count: 1 },
     { name: "backImage", count: 1 },
+    { name: "extraImages", count: 4 },
   ]),
   handleImages("image"),
   handleImages("backImage"),
-  addNewProduct
+  handleImages("extraImages"),
+  addNewProduct,
 );
-router.patch("/:id", auth, restrictTo("admin"), updateProduct);
+router.patch(
+  "/:id",
+  auth,
+  restrictTo("admin"),
+  uploadImages([
+    { name: "image", count: 1 },
+    { name: "backImage", count: 1 },
+    { name: "extraImages", count: 4 },
+  ]),
+  handleImages("image"),
+  handleImages("backImage"),
+  handleImages("extraImages"),
+  updateProduct,
+);
 router.delete("/:id", auth, restrictTo("admin"), deleteProduct);
 
 module.exports = router;

@@ -73,8 +73,8 @@ exports.signup = async (req, res, next) => {
   });
   newUser.password = undefined;
 
-  const url = `${req.protocol}://${req.get("host")}/me`;
-  await new Email(newUser, url).sendWelcome();
+    // const url = `${req.protocol}://${req.get("host")}/me`;
+    // await new Email(newUser, url).sendWelcome();
 
   res.status(201).send({
     status: "success",

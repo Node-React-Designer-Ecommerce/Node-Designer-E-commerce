@@ -10,6 +10,15 @@ class APIFeatures {
     const excludedFields = ["page", "sort", "limit", "fields", "search"]; // Exclude unnecessary fields
     excludedFields.forEach((el) => delete queryObj[el]);
 
+    if (queryObj.size) {
+      queryObj["stock.size"] = {
+        $regex: `^${queryObj.size}$`,
+        $options: "i",
+      };
+
+      delete queryObj.size;
+    }
+
     // Advanced filtering for operators (gte, gt, lte, lt)
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);

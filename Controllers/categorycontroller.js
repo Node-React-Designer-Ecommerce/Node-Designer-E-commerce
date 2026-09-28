@@ -2,11 +2,27 @@ const AppError = require("../Utils/AppError");
 const Category = require("../Models/categoryModel");
 const categorySchema = require("../Validations/categoriesSchemas");
 
-
 ///1- Get all Categories ///
 
 exports.getAllCategories = async (req, res, next) => {
-  const categories = await Category.find();
+  const categories = await Category.aggregate([
+    {
+      $lookup: {
+        from: "products",
+        localField: "_id",
+        foreignField: "category",
+        as: "products",
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        description: 1,
+        image: 1,
+        productsCount: { $size: "$products" },
+      },
+    },
+  ]);
   if (!categories) throw new AppError("No Categories Found", 404);
   res.status(200).send({
     status: "success",
@@ -58,7 +74,7 @@ exports.updateCategroy = async (req, res, next) => {
   const category = await Category.findByIdAndUpdate(
     { _id: categoryId },
     { ...req.body, image },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   );
   if (!category) throw new AppError("Category not found", 404);
   res.status(200).send({

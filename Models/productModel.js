@@ -23,12 +23,19 @@ const productSchema = new mongoose.Schema(
     backImage: {
       type: String,
     },
+    extraImages: [{ type: String }],
 
     isDesignable: {
       type: Boolean,
     },
-    canvasWidth: Number,
-    canvasHeight: Number,
+    canvasWidth: {
+      type: Number,
+      default: 400,
+    },
+    canvasHeight: {
+      type: Number,
+      default: 500,
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
@@ -40,7 +47,7 @@ const productSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 const Product = mongoose.model("Product", productSchema);
 module.exports = Product;
