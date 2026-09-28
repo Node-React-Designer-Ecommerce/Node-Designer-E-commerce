@@ -6,7 +6,7 @@ const APIFeatures = require("../Utils/APIFeatures");
 exports.getAllProduct = async (req, res, next) => {
   const features = new APIFeatures(
     Product.find({ isDesignable: { $ne: true }, inactive: { $ne: true } }),
-    req.query
+    req.query,
   )
     .filter()
     .sort()
@@ -79,20 +79,18 @@ exports.addNewProduct = async (req, res, next) => {
 };
 // 4- update product by id
 exports.updateProduct = async (req, res, next) => {
-  const productId = req.params.id;
+  const product = await Product.findById(req.params.id);
 
-  const updateProduct = await Product.findByIdAndUpdate(
-    { _id: productId },
-    { ...req.body },
-    { new: true, runValidators: true }
-  );
-  if (!updateProduct) {
-    throw new AppError("No product found with that ID", 404);
-  }
+  if (!product) throw new AppError("No product found", 404);
+
+  Object.assign(product, req.body);
+
+  await product.save();
+
   res.status(200).send({
     status: "success",
     message: "product updated successfully",
-    data: { updateProduct },
+    data: { product: updateProduct },
   });
 };
 

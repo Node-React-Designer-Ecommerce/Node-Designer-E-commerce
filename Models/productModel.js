@@ -55,6 +55,14 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    discount: {
+      type: Number,
+      default: 0,
+    },
+    isOnSale: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -62,5 +70,32 @@ const productSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
+
+productSchema.virtual("totalStock").get(function () {
+  return this.stock.reduce((acc, item) => acc + item.quantity, 0);
+});
+
+productSchema.virtual("finalPrice").get(function () {
+  if (!this.isOnSale || !this.discount) return this.price;
+  return Math.round(this.price * (1 - this.discount / 100));
+});
+
+productSchema.pre("save", function (next) {
+  const totalStock = this.stock.reduce(
+    (acc, item) => acc + item.quantity,
+    0
+  );
+
+  if (totalStock <= 4) {
+    this.isOnSale = true;
+    this.discount = 20;
+  } else {
+    this.isOnSale = false;
+    this.discount = 0;
+  }
+
+  next();
+});
+
 const Product = mongoose.model("Product", productSchema);
 module.exports = Product;
