@@ -11,12 +11,15 @@ const productSchema = new mongoose.Schema(
     price: {
       type: Number,
     },
-    stock: [
-      {
-        quantity: Number,
-        size: String,
-      },
-    ],
+    stock: {
+      type: [
+        {
+          quantity: Number,
+          size: String,
+        },
+      ],
+      default: [],
+    },
     image: {
       type: String,
     },
@@ -72,7 +75,10 @@ const productSchema = new mongoose.Schema(
 );
 
 productSchema.virtual("totalStock").get(function () {
-  return this.stock.reduce((acc, item) => acc + item.quantity, 0);
+  return (this.stock || []).reduce(
+    (acc, item) => acc + (item.quantity || 0),
+    0,
+  );
 });
 
 productSchema.virtual("finalPrice").get(function () {
@@ -81,8 +87,8 @@ productSchema.virtual("finalPrice").get(function () {
 });
 
 productSchema.pre("save", function (next) {
-  const totalStock = this.stock.reduce(
-    (acc, item) => acc + item.quantity,
+  const totalStock = (this.stock || []).reduce(
+    (acc, item) => acc + (item.quantity || 0),
     0
   );
 

@@ -11,6 +11,35 @@ const {
   resetPasswordSchema,
 } = require("./../Validations/usersSchemas");
 
+const signToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+const createSendToken = (user, statusCode, res, message) => {
+  const token = signToken(user._id);
+
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+    ),
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production",
+  };
+
+  res.cookie("jwt", token, cookieOptions);
+
+  user.password = undefined;
+
+  res.status(statusCode).json({
+    status: "success",
+    message,
+    data: { token, role: user.role, user },
+  });
+};
+
 exports.getUsers = async (req, res, next) => {
   const users = await User.find();
   if (!users) {
@@ -37,8 +66,6 @@ exports.getUserById = async (req, res, next) => {
 };
 
 exports.signup = async (req, res, next) => {
-  // Validate request body with Joi
-  console.log(req.body);
   const { error } = signupSchema.validate(req.body, { abortEarly: false });
   if (error) {
     const errorMessages = error.details
@@ -52,15 +79,14 @@ exports.signup = async (req, res, next) => {
     throw new AppError("Passwords do not match", 400);
   }
   //hash the password
-  const hashedPassword = await bcrypt.hash(password, 8);
 
   //see if the user exists or not
   const existEmail = await User.findOne({ email });
-  if (existEmail)
-    return res
-      .status(409)
-      .send({ status: "fail", message: "email is already used" });
+  if (existEmail) {
+    throw new AppError("email is already used", 409);
+  }
 
+  const hashedPassword = await bcrypt.hash(password, 8);
   //create new user
   const newUser = await User.create({
     name,
@@ -73,14 +99,10 @@ exports.signup = async (req, res, next) => {
   });
   newUser.password = undefined;
 
-    // const url = `${req.protocol}://${req.get("host")}/me`;
-    // await new Email(newUser, url).sendWelcome();
+  // const url = `${req.protocol}://${req.get("host")}/me`;
+  // await new Email(newUser, url).sendWelcome();
 
-  res.status(201).send({
-    status: "success",
-    message: "User Created Successfully",
-    data: { user: newUser },
-  });
+  createSendToken(newUser, 201, res, "User Created Successfully");
 };
 
 exports.deleteUser = async (req, res, next) => {
@@ -103,7 +125,7 @@ exports.updateUser = async (req, res, next) => {
     { name, address, phone },
     {
       new: true,
-    }
+    },
   );
   if (!updatedUser) {
     throw new AppError("No user found with that ID", 404);
@@ -135,15 +157,7 @@ exports.login = async (req, res, next) => {
     throw new AppError("email or password is Invalid", 400);
   }
 
-  //generate token
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "5d",
-  });
-  res.status(200).send({
-    status: "success",
-    message: "Login Successful",
-    data: { token, role: user.role },
-  });
+  createSendToken(user, 200, res, "Login Successful");
 };
 
 exports.getLoggedInUser = async (req, res) => {
@@ -231,7 +245,6 @@ exports.updatePassword = async (req, res, next) => {
   if (password !== passwordConfirm) {
     throw new AppError("Passwords do not match", 400);
   }
-  console.log(req.user._id);
 
   const user = await User.findById(req.user._id).select("+password");
 
@@ -249,4 +262,12 @@ exports.updatePassword = async (req, res, next) => {
     status: "success",
     message: "Password updated successfully",
   });
+};
+
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
 };
